@@ -10,7 +10,7 @@ npm install -g qupload
 
 ## Config
 
-配置文件```.quploadrc```
+通过配置文件```.quploadrc```或```--config```参数指定JSON文件
 
 ```json
 {
@@ -32,6 +32,7 @@ Usage: qupload [options] file|directory
 
 Options:
   --version        Show version number                                 [boolean]
+  --config, -c     Path to JSON config file                             [string]
   --recursive, -r  递归遍历目录                                        [boolean]
   --prefix, -p     上传路径前缀                           [string] [default: ""]
   --hash, -h       使用hash作为key                                     [boolean]

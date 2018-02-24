@@ -8,14 +8,15 @@ const Listr = require('listr');
 const configUpload = require('./lib/config-upload');
 const flatten = require('./lib/flatten');
 
-const configPath = findUp.sync(['.quploadrc', '.qupload.json']);
-const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {};
-
 const {
-  _: inputs, prefix, recursive, hash,
+  _: inputs, prefix, recursive, hash, config: cliConfigPath,
 } = yargs
-  .config(config)
   .usage('Usage: $0 [options] file|directory')
+  .option('config', {
+    alias: 'c',
+    describe: 'Path to JSON config file',
+    type: 'string',
+  })
   .option('recursive', {
     alias: 'r',
     describe: '递归遍历目录',
@@ -33,12 +34,16 @@ const {
     type: 'boolean',
   })
   .help()
+  .demandCommand(1, '至少需指定一个文件或目录')
   .argv;
 
-
-const upload = configUpload(config);
-
 try {
+  const configPath = cliConfigPath || findUp.sync(['.quploadrc', '.qupload.json']);
+  const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {};
+  if (!config) {
+    throw new Error('未通过 .quploadrc 或 --config 指定配置文件');
+  }
+  const upload = configUpload(config);
   const localFiles = flatten(inputs, recursive);
   const tasks = new Listr(localFiles.map(file => ({
     title: `[${file}]`,
