@@ -1,0 +1,40 @@
+{
+  "name": "qupload",
+  "version": "0.1.0",
+  "description": "upload files to qiniu cli",
+  "main": "index.js",
+  "bin": {
+    "qupload": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/samuraime/qupload.git"
+  },
+  "keywords": [
+    "qiniu",
+    "cli"
+  ],
+  "author": "SamuraiMe",
+  "license": "MIT",
+  "dependencies": {
+    "find-up": "^2.1.0",
+    "listr": "^0.13.0",
+    "qiniu": "^7.1.2",
+    "yargs": "^11.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.18.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.9.0"
+  },
+  "bugs": {
+    "url": "https://github.com/samuraime/qupload/issues"
+  },
+  "homepage": "https://github.com/samuraime/qupload#readme",
+  "directories": {
+    "lib": "lib"
+  }
+}
