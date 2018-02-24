@@ -55,6 +55,7 @@ try {
     },
   })), {
     concurrent: true,
+    exitOnError: false,
   });
 
   tasks.run().catch((error) => {
