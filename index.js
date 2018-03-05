@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 const findUp = require('find-up');
 const yargs = require('yargs');
@@ -8,10 +9,35 @@ const Listr = require('listr');
 const configUpload = require('./lib/config-upload');
 const flatten = require('./lib/flatten');
 
+const getHash = file => new Promise((resolve, reject) => {
+  const hash = crypto.createHash('sha1');
+  const stream = fs.createReadStream(file);
+  stream.on('readable', () => {
+    const data = stream.read();
+    if (data) {
+      hash.update(data);
+    } else {
+      resolve(hash.digest('hex'));
+    }
+  });
+  stream.on('error', reject);
+});
+
+const getKey = async (file, prefix, usePath, relativeFrom, useHash) => {
+  let key = prefix;
+  if (usePath) {
+    const relativePath = path.relative(relativeFrom, file);
+    const relative = path.dirname(relativePath);
+    key += relative === '.' ? '' : `${relative}/`;
+  }
+  key += useHash ? await getHash(file) : path.parse(file).base;
+  return key;
+};
+
 const {
-  _: inputs, prefix, recursive, hash, config: cliConfigPath,
+  _: inputs, prefix, recursive, useHash, usePath, disableKey, config: cliConfigPath,
 } = yargs
-  .usage('Usage: $0 [options] file|directory')
+  .usage('Usage: $0 [options] files|directories')
   .option('config', {
     alias: 'c',
     describe: 'Path to JSON config file',
@@ -25,12 +51,22 @@ const {
   .option('prefix', {
     alias: 'p',
     default: '',
-    describe: '上传路径前缀',
+    describe: '上传key前缀',
     type: 'string',
   })
-  .option('hash', {
-    alias: 'h',
-    describe: '使用hash作为key',
+  .option('use-hash', {
+    default: false,
+    describe: '使用SHA1作为key',
+    type: 'boolean',
+  })
+  .option('use-path', {
+    default: false,
+    describe: '使用文件相对路径作为key前缀',
+    type: 'boolean',
+  })
+  .option('disable-key', {
+    default: false,
+    describe: '禁用key, 使用七牛默认方式生成',
     type: 'boolean',
   })
   .help()
@@ -45,10 +81,12 @@ try {
   }
   const upload = configUpload(config);
   const localFiles = flatten(inputs, recursive);
-  const tasks = new Listr(localFiles.map(file => ({
+  const tasks = new Listr(localFiles.map(({ file, relativeFrom }) => ({
     title: `[${file}]`,
     async task(ctx, task) {
-      const key = hash ? undefined : `${prefix}${path.parse(file).base}`;
+      const key = disableKey
+        ? undefined
+        : await getKey(file, prefix, usePath, relativeFrom, useHash);
       const { url } = await upload(file, key);
       // eslint-disable-next-line
       task.title += ` ${url}`;
