@@ -1,5 +1,9 @@
 # qupload
 
+[![npm version](https://badge.fury.io/js/qupload.svg)](https://badge.fury.io/js/qupload)
+[![Build Status](https://travis-ci.org/samuraime/qupload.svg)](https://travis-ci.org/samuraime/qupload)
+[![Dependencies Status](https://david-dm.org/samuraime/qupload.svg)](https://david-dm.org/samuraime/qupload)
+
 CLI上传七牛CDN
 
 ## Install
@@ -43,34 +47,41 @@ Options:
 
 ## Example
 
+假设有此文件: ```./build/js/index.js```
+
 - 上传单个文件
 
 ```sh
-qupload ./test.js
+qupload ./build/js/index.js
+# ✔ [./build/js/index.js] http://cdn.samuraime.com/index.js
 ```
 
 - 指定前缀, 使用原文件名作为文件名
 
 ```sh
-qupload -r --prefix=test/ ./test/
+qupload -r --prefix=test/ ./build/
+# ✔ [build/js/index.js] http://cdn.samuraime.com/test/index.js
 ```
 
 - 指定前缀, 并且使用文件路径作为分割, 使用原文件名作为文件名
 
 ```sh
-qupload -r --prefix=test/ --use-path ./test/
+qupload -r --prefix=test/ --use-path ./build/
+# ✔ [build/js/index.js] http://cdn.samuraime.com/test/js/index.js
 ```
 
 - 指定前缀, 并且使用文件路径作为分割, 使用 hash 作为文件名
 
 ```sh
-qupload -r --prefix=test/ --use-path --use-hash ./test/
+qupload -r --prefix=test/ --use-path --use-hash ./build/
+# ✔ [build/js/index.js] http://cdn.samuraime.com/test/js/b58d988070d02e44d27a6b019e23a1665bd1f790
 ```
 
 - 禁用 key 生成规则, 使用七牛上传策略saveKey字段所指定魔法变量生成 Key
 
 ```sh
-qupload -r --disable-key ./test/
+qupload -r --disable-key ./build/
+# ✔ [build/js/index.js] http://cdn.samuraime.com/FrWNmIBw0C5E0nprAZ4joWZb0feQ
 ```
 
 ## License
