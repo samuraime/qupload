@@ -1,38 +1,12 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const crypto = require('crypto');
-const path = require('path');
 const findUp = require('find-up');
 const yargs = require('yargs');
 const Listr = require('listr');
-const configUpload = require('./lib/config-upload');
-const flatten = require('./lib/flatten');
-
-const getHash = file => new Promise((resolve, reject) => {
-  const hash = crypto.createHash('sha1');
-  const stream = fs.createReadStream(file);
-  stream.on('readable', () => {
-    const data = stream.read();
-    if (data) {
-      hash.update(data);
-    } else {
-      resolve(hash.digest('hex'));
-    }
-  });
-  stream.on('error', reject);
-});
-
-const getKey = async (file, prefix, usePath, relativeFrom, useHash) => {
-  let key = prefix;
-  if (usePath) {
-    const relativePath = path.relative(relativeFrom, file);
-    const relative = path.dirname(relativePath);
-    key += relative === '.' ? '' : `${relative}/`;
-  }
-  key += useHash ? await getHash(file) : path.parse(file).base;
-  return key;
-};
+const configUpload = require('./lib/configUpload');
+const list = require('./lib/list');
+const getKey = require('./lib/getKey');
 
 const {
   _: inputs, prefix, recursive, useHash, usePath, disableKey, config: cliConfigPath,
@@ -80,7 +54,13 @@ try {
     throw new Error('未通过 .quploadrc 或 --config 指定配置文件');
   }
   const upload = configUpload(config);
-  const localFiles = flatten(inputs, recursive);
+  const localFiles = inputs.reduce((withRelativeFiles, current, index) => {
+    const files = list(current, recursive).map(file => ({
+      file,
+      relativeFrom: inputs[index],
+    }));
+    return withRelativeFiles.concat(files);
+  }, []);
   const tasks = new Listr(localFiles.map(({ file, relativeFrom }) => ({
     title: `[${file}]`,
     async task(ctx, task) {
