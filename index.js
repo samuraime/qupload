@@ -96,7 +96,6 @@ try {
 
   tasks.run().catch((error) => {
     console.error(error.message);
-    process.exit(1);
   });
 } catch (error) {
   console.error(error.message);
