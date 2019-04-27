@@ -1,20 +1,17 @@
-# qupload
-
-[![npm version](https://badge.fury.io/js/qupload.svg)](https://badge.fury.io/js/qupload)
-[![Build Status](https://travis-ci.org/samuraime/qupload.svg)](https://travis-ci.org/samuraime/qupload)
-[![Dependencies Status](https://david-dm.org/samuraime/qupload.svg)](https://david-dm.org/samuraime/qupload)
+# qupload [![npm version](https://badge.fury.io/js/qupload.svg)](https://badge.fury.io/js/qupload) [![CircleCI](https://circleci.com/gh/samuraime/qupload.svg?style=shield)](https://circleci.com/gh/samuraime/qupload)
 
 CLI上传七牛CDN
 
 ## Install
 
 ```sh
-npm install -g qupload
+npm install qupload
 ```
 
 ## Config
 
-通过配置文件```.quploadrc```或```--config```参数指定JSON文件
+通过配置文件```.quploadrc```或```--config```参数指定JSON文件.  
+或者完全通过环境变量: QUPLOAD_ACCESS_KEY, QUPLOAD_SECRET_KEY, QUPLOAD_BUCKET, QUPLOAD_ZONE, QUPLOAD_DOMAIN.
 
 ```json
 {

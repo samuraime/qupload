@@ -9,9 +9,21 @@ const list = require('./lib/list');
 const getKey = require('./lib/getKey');
 
 const {
-  _: inputs, prefix, recursive, useHash, usePath, disableKey, config: cliConfigPath,
+  _: inputs,
+  prefix,
+  recursive,
+  useHash,
+  usePath,
+  disableKey,
+  config: cliConfigPath,
+  accessKey,
+  secretKey,
+  bucket,
+  zone,
+  domain,
 } = yargs
   .usage('Usage: $0 [options] files|directories')
+  .env('QUPLOAD')
   .option('config', {
     alias: 'c',
     describe: 'Path to JSON config file',
@@ -49,7 +61,13 @@ const {
 
 try {
   const configPath = cliConfigPath || findUp.sync(['.quploadrc', '.qupload.json']);
-  const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {};
+  const config = configPath ? JSON.parse(fs.readFileSync(configPath)) : {
+    accessKey,
+    secretKey,
+    bucket,
+    zone,
+    domain,
+  };
   if (!config) {
     throw new Error('未通过 .quploadrc 或 --config 指定配置文件');
   }
@@ -78,8 +96,9 @@ try {
 
   tasks.run().catch((error) => {
     console.error(error.message);
+    process.exit(1);
   });
 } catch (error) {
   console.error(error.message);
+  process.exit(1);
 }
-
